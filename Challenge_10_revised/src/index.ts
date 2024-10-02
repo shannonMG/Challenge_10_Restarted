@@ -220,14 +220,14 @@ export const startCli = async () => {
             break;  
          
             case 'View Employees by Manager':
-    const employeesGroupedByManager = await viewEmployeesByManager();
+            const employeesGroupedByManager = await viewEmployeesByManager();
     
-    console.log('Employees by Manager:');
-    for (const [___, managerData] of Object.entries(employeesGroupedByManager)) {
-        console.log(`Manager: ${managerData.managerName}`);
-        if (managerData.employees.length > 0) {
+            console.log('Employees by Manager:');
+            for (const [___, managerData] of Object.entries(employeesGroupedByManager)) {
+            console.log(`Manager: ${managerData.managerName}`);
+            if (managerData.employees.length > 0) {
             console.table(managerData.employees); // Display employees as a table
-        } else {
+            } else {
             console.log('  No employees under this manager.');
         }
     }
