@@ -1,9 +1,8 @@
 import inquirer from 'inquirer';
 import { viewAllRoles, addRole, deleteRole } from './controllers/roleActions.js'; 
-import { getDepartments } from './controllers/departmentActions.js';
-import { viewEmployeesByManager } from './controllers/managerActions.js';
+import { getDepartments, viewAllDepartments, addDepartment, deleteDepartment, viewDepartmentBudget } from './controllers/departmentActions.js';
 import { connectToDb } from './connection.js';  // Ensure you're connecting to the DB
-import { addEmployee, viewAllEmployees, deleteEmployee, updateEmployeeRole } from './controllers/employeeActions.js';
+import { addEmployee, viewAllEmployees, deleteEmployee, updateEmployeeRole, listEmployeesWithDetails } from './controllers/employeeActions.js';
 
 // Function to handle the user's input
 export const startCli = async () => {
@@ -33,7 +32,21 @@ export const startCli = async () => {
                 type: 'list',
                 name: 'action',
                 message: 'What do you want to do?',
-                choices: ['View All Employees', 'Add Employee', 'Delete Employee', 'Update an Employee Role', "Update Employee's Manager", 'View Employees by Manager', 'Add Role', 'View All Roles', 'Delete Role', 'Add Dempartment', 'Exit']
+                choices: [
+                    'View All Employees', 
+                    'Add Employee', 
+                    'Update Employee Role', 
+                    "Update Employee Manager",
+                    'Delete Employee',
+                    'View All Roles', 
+                    'Add Role', 
+                    'Delete Role', 
+                    'View All Departments', 
+                    'Add Department', 
+                    'Delete Department', 
+                    'View Department Budget',
+                    'Exit'
+                ]
             }
         ]);
 
@@ -116,7 +129,7 @@ export const startCli = async () => {
                 return; // Exit the CLI loop
 
             case 'View All Employees':
-                const allEmployees = await viewAllEmployees();
+                const allEmployees = await listEmployeesWithDetails();
                 if (allEmployees.length > 0) {
                     console.log('List of Employees:');
                     console.table(allEmployees);
@@ -179,7 +192,7 @@ export const startCli = async () => {
             console.log('Employee deleted successfully!'); // Confirmation message
             break;
           
-            case 'Update an Employee Role':
+            case 'Update Employee Role':
               const updateInfo = await inquirer.prompt([
                 {
                     type: 'list',
@@ -199,7 +212,7 @@ export const startCli = async () => {
             await updateEmployeeRole(updateInfo.employeeId, updateInfo.newRoleId);
             break;  
           
-            case "Update Employee's Manager":
+            case "Update Employee Manager":
               const updateManager = await inquirer.prompt([
                 {
                     type: 'list',
@@ -218,22 +231,59 @@ export const startCli = async () => {
             // Call updateEmployeeRole function
             await updateEmployeeRole(updateManager.employeeId, updateManager.newManagerId);
             break;  
-         
-            case 'View Employees by Manager':
-            const employeesGroupedByManager = await viewEmployeesByManager();
-    
-            console.log('Employees by Manager:');
-            for (const [___, managerData] of Object.entries(employeesGroupedByManager)) {
-            console.log(`Manager: ${managerData.managerName}`);
-            if (managerData.employees.length > 0) {
-            console.table(managerData.employees); // Display employees as a table
+
+            case 'View All Departments':
+            const allDepartments = await viewAllDepartments();
+            if (allDepartments.length > 0) {
+                console.log('List of Departments:');
+                console.table(allDepartments);
             } else {
-            console.log('  No employees under this manager.');
+                console.log('No Departments found.');
+            }
+            break;
+
+            case 'Add Department' :
+            const departmentInfo = await inquirer.prompt([
+                {
+                    type: 'input',
+                    name: 'name',
+                    message: 'Enter the department name:'
+                },
+                ]);
+                await addDepartment(departmentInfo.name,);
+                break;
+                
+            case 'Delete Department':
+  
+            const deleteResponse = await inquirer.prompt([
+             {
+                 type: 'list',
+                 name: 'departmentId', // Use departmentId for clarity
+                 message: 'Select the department to delete:',
+                 choices: departmentChoices, 
+             }
+            ]);
+                const selectedDepartment = departmentChoices.find(department => department.value === deleteResponse.departmentId);
+                if (selectedDepartment) {
+                await deleteDepartment(selectedDepartment.name); 
+                console.log('Department deleted successfully!'); // Confirmation message
+                } else {
+                console.log('Department not found.');
+                }
+                break;
+          
+            case 'View Department Budget':
+            const selectedDepartmentResponse = await inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'departmentId',
+                    message: 'Select a department to view the budget:',
+                    choices: departmentChoices,
+                },
+            ]);
+            const budget = await viewDepartmentBudget(selectedDepartmentResponse.departmentId);
+            console.log(`The total budget for the selected department is: $${budget}`);
+            break;
         }
-    }
-    break;
-              
-         
-          }
     }
 };

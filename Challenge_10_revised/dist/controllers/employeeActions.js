@@ -56,3 +56,30 @@ export const updateEmployeeManager = async (employeeId, newManagerId) => {
         throw error;
     }
 };
+export const listEmployeesWithDetails = async () => {
+    try {
+        const result = await pool.query(`
+            SELECT 
+                employee.id, 
+                employee.first_name, 
+                employee.last_name, 
+                role.title, 
+                departments.name AS department,  -- Select department name
+                role.salary, 
+                (SELECT CONCAT(m.first_name, ' ', m.last_name) 
+                 FROM employee m 
+                 WHERE m.id = employee.manager_id) AS manager
+            FROM 
+                employee 
+            JOIN 
+                role ON employee.role_id = role.id
+            JOIN 
+                departments ON role.department_id = departments.id;  -- Join with the departments table
+            `);
+        return result.rows; // Returns the list of employees with detailed information
+    }
+    catch (error) {
+        console.error('Error retrieving employee details:', error);
+        throw error; // Rethrow the error for further handling if needed
+    }
+};
