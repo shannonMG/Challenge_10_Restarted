@@ -1,7 +1,7 @@
 import inquirer from 'inquirer';
 import { viewAllRoles, addRole, deleteRole } from './controllers/roleActions.js';
 import { getDepartments, viewAllDepartments, addDepartment, deleteDepartment, viewDepartmentBudget } from './controllers/departmentActions.js';
-import { connectToDb } from './connection.js'; // Ensure you're connecting to the DB
+import { connectToDb } from './connection.js';
 import { addEmployee, viewAllEmployees, deleteEmployee, updateEmployeeRole, listEmployeesWithDetails, updateEmployeeManager } from './controllers/employeeActions.js';
 // CLI: //
 export const startCli = async () => {
@@ -69,16 +69,11 @@ export const startCli = async () => {
                     }
                 ]);
                 await addRole(roleInfo.title, parseFloat(roleInfo.salary), parseInt(roleInfo.departmentId));
-                console.log('Role added successfully!'); // Success message
                 break;
             case 'View All Roles':
                 const allRoles = await viewAllRoles();
                 if (allRoles.length > 0) {
-                    console.log('List of Roles:');
                     console.table(allRoles);
-                }
-                else {
-                    console.log('No roles found.');
                 }
                 break;
             case 'Delete Role':
@@ -98,10 +93,6 @@ export const startCli = async () => {
                     ]);
                     // Call deleteRole function
                     await deleteRole(deleteAnswer.roleId);
-                    console.log('Role deleted successfully!'); // Confirmation message
-                }
-                else {
-                    console.log('No roles found to delete.');
                 }
                 break;
             case 'Exit':
@@ -145,13 +136,11 @@ export const startCli = async () => {
                 await addEmployee(EmployeeInfo.first_name, EmployeeInfo.last_name, EmployeeInfo.roleId, EmployeeInfo.managerId);
                 break;
             case 'Delete Employee':
-                //console.log('Reached Delete Employee case'); // Log for debugging
                 const deleteAnswer = await inquirer.prompt([
                     {
                         type: 'list',
                         name: 'employeeId', // Use employeeId for clarity
                         message: 'Select the employee to delete:',
-                        choices: managerChoices, // Use managerChoices here
                     }
                 ]);
                 const selectedEmployee = managerChoices.find(employee => employee.value === deleteAnswer.employeeId);
@@ -161,7 +150,7 @@ export const startCli = async () => {
                 else {
                     console.log('Employee not found.');
                 }
-                console.log('Employee deleted successfully!'); // Confirmation message
+                console.log('Employee deleted successfully!');
                 break;
             case 'Update Employee Role':
                 const updateInfo = await inquirer.prompt([
@@ -178,7 +167,6 @@ export const startCli = async () => {
                         choices: roleChoices,
                     }
                 ]);
-                // Call updateEmployeeRole function
                 await updateEmployeeRole(updateInfo.employeeId, updateInfo.newRoleId);
                 break;
             case "Update Employee Manager":
@@ -196,7 +184,6 @@ export const startCli = async () => {
                         choices: managerChoices,
                     }
                 ]);
-                // Call updateEmployeeRole function
                 await updateEmployeeManager(updateManager.employeeId, updateManager.newManagerId);
                 break;
             case 'View All Departments':
