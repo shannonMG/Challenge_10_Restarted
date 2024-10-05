@@ -163,7 +163,6 @@ export const startCli = async () => {
                      type: 'list',
                     name: 'employeeId', // Use employeeId for clarity
                     message: 'Select the employee to delete:',
-                 choices: managerChoices, // Use managerChoices here
                  }
             ]);
 
